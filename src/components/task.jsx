@@ -18,7 +18,6 @@ class Task extends React.Component {
             >
               del
             </button>
-            <button onClick={() => console.log(item)}>console.log</button>
           </li>
         ))}
       </ul>
