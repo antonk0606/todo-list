@@ -1,3 +1,0 @@
-headerPlaceholder;
-
-export default headerPlaceholder;
