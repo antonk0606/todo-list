@@ -9,12 +9,13 @@ class TodoListTable extends React.Component {
 
     this.state = {
       todo: [],
-      allTodo: [],
-      isChecked: true,
+      filter: "All",
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.isDeleted = this.isDeleted.bind(this);
+    this.isTaskToggle = this.isTaskToggle.bind(this);
   }
 
   handleSubmit(e) {
@@ -22,55 +23,44 @@ class TodoListTable extends React.Component {
 
     const newItem = {
       id: Date.now(),
-      text: e.target.allTodo.value,
-      isDone: false,
+      text: e.target.todo.value,
+      taskComplited: false,
     };
 
     this.setState((prevState) => ({
-      allTodo: [...prevState.allTodo, newItem],
-      todo: [...prevState.allTodo, newItem],
+      todo: [...prevState.todo, newItem],
+      filter: "All",
     }));
+    e.target.todo.value = "";
   }
-  isDeleted = (item) => {
-    item = item.id;
-
+  isDeleted(id) {
     this.setState((prevState) => ({
-      allTodo: prevState.allTodo.filter((el) => el.id !== item),
+      todo: prevState.todo.filter((item) => item.id !== id),
     }));
-  };
-
-  isDoneToggle(item) {
-    item.isDone = item.isDone ? false : true;
   }
-
+  isTaskToggle(itemId, taskComplited) {
+    this.setState((prevState) => ({
+      todo: prevState.todo.map((item) => {
+        if (item.id === itemId) {
+          item.taskComplited = !taskComplited;
+          return item;
+        }
+        return item;
+      }),
+    }));
+    console.log(this.state.todo);
+  }
   handleChange(e) {
-    const filterValue = e.target.value;
-    if (filterValue === "Active") {
-      this.setState((prevState) => ({
-        todo: prevState.allTodo.filter((el) => !el.isDone),
-      }));
-    } else if (filterValue === "Completed") {
-      this.setState((prevState) => ({
-        todo: prevState.allTodo.filter((el) => el.isDone),
-      }));
-    } else {
-      this.setState((prevState) => ({
-        todo: prevState.allTodo.map((el) => el),
-      }));
-    }
+    this.setState(() => ({
+      filter: e.target.value,
+    }));
   }
-
-  toggleChange = () => {
-    this.setState({
-      isChecked: !this.state.isChecked,
-    });
-  };
 
   render() {
     return (
       <div className="TodoList">
         <form onSubmit={this.handleSubmit} className="TodoInputWrapper">
-          <input type="text" name="allTodo" placeholder="Create a new task" />
+          <input type="text" name="todo" placeholder="Create a new task" />
           <button type="submit" className="addButton">
             Add
           </button>
@@ -78,8 +68,9 @@ class TodoListTable extends React.Component {
         <div className="TodoListTable">
           <Task
             items={this.state.todo}
+            filter={this.state.filter}
             isDeleted={this.isDeleted}
-            isDoneToggle={this.isDoneToggle}
+            isTaskToggle={this.isTaskToggle}
           />
         </div>
         <div className="Footer">
@@ -89,22 +80,21 @@ class TodoListTable extends React.Component {
               name="todolistseting"
               type="radio"
               value="All"
-              defaultChecked={this.state.isChecked}
-              onChange={this.toggleChange}
+              checked={this.state.filter === "All"}
             />{" "}
             All
             <input
               name="todolistseting"
               type="radio"
               value="Active"
-              onChange={this.toggleChange}
+              checked={this.state.filter === "Active"}
             />{" "}
             Active
             <input
               name="todolistseting"
               type="radio"
               value="Completed"
-              onChange={this.toggleChange}
+              checked={this.state.filter === "Completed"}
             />{" "}
             Completed
           </form>
