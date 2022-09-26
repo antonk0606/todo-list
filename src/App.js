@@ -2,20 +2,27 @@ import React from "react";
 import "./styles.css";
 
 import Task from "./components/task";
+import Filters from "./components/filters";
 
-class TodoListTable extends React.Component {
+const FILTER_MAP = {
+  all: () => true,
+  active: (item) => !item.isCompleted,
+  completed: (item) => item.isCompleted,
+};
+
+class TodoList extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      todo: [],
-      filter: "All",
+      todoList: [],
+      filter: "all",
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.isDeleted = this.isDeleted.bind(this);
-    this.isTaskToggle = this.isTaskToggle.bind(this);
+    this.filterChange = this.filterChange.bind(this);
+    this.deleteTodo = this.deleteTodo.bind(this);
+    this.toggleTodo = this.toggleTodo.bind(this);
   }
 
   handleSubmit(e) {
@@ -24,33 +31,39 @@ class TodoListTable extends React.Component {
     const newItem = {
       id: Date.now(),
       text: e.target.todo.value,
-      taskComplited: false,
+      isCompleted: false,
     };
 
     this.setState((prevState) => ({
-      todo: [...prevState.todo, newItem],
-      filter: "All",
+      ...prevState,
+      todoList: [...prevState.todoList, newItem],
     }));
+
     e.target.todo.value = "";
   }
-  isDeleted(id) {
+
+  deleteTodo(id) {
     this.setState((prevState) => ({
-      todo: prevState.todo.filter((item) => item.id !== id),
+      todoList: prevState.todoList.filter((todo) => todo.id !== id),
     }));
   }
-  isTaskToggle(itemId, taskComplited) {
+
+  toggleTodo(id) {
     this.setState((prevState) => ({
-      todo: prevState.todo.map((item) => {
-        if (item.id === itemId) {
-          item.taskComplited = !taskComplited;
-          return item;
+      todoList: prevState.todoList.map((todo) => {
+        if (todo.id === id) {
+          return {
+            ...todo,
+            isCompleted: !todo.isCompleted,
+          };
         }
-        return item;
+
+        return todo;
       }),
     }));
-    console.log(this.state.todo);
   }
-  handleChange(e) {
+
+  filterChange(e) {
     this.setState(() => ({
       filter: e.target.value,
     }));
@@ -66,39 +79,27 @@ class TodoListTable extends React.Component {
           </button>
         </form>
         <div className="TodoListTable">
-          <Task
-            items={this.state.todo}
-            filter={this.state.filter}
-            isDeleted={this.isDeleted}
-            isTaskToggle={this.isTaskToggle}
-          />
+          <ul>
+            {this.state.todoList
+              .filter(FILTER_MAP[this.state.filter])
+              .map((todo) => {
+                return (
+                  <Task
+                    key={todo.id}
+                    id={todo.id}
+                    isChecked={todo.isCompleted}
+                    text={todo.text}
+                    deleteTodo={this.deleteTodo}
+                    toggleTodo={this.toggleTodo}
+                  />
+                );
+              })}
+          </ul>
         </div>
-        <div className="Footer">
-          <span>Show:</span>
-          <form onChange={this.handleChange}>
-            <input
-              name="todolistseting"
-              type="radio"
-              value="All"
-              checked={this.state.filter === "All"}
-            />{" "}
-            All
-            <input
-              name="todolistseting"
-              type="radio"
-              value="Active"
-              checked={this.state.filter === "Active"}
-            />{" "}
-            Active
-            <input
-              name="todolistseting"
-              type="radio"
-              value="Completed"
-              checked={this.state.filter === "Completed"}
-            />{" "}
-            Completed
-          </form>
-        </div>
+        <Filters
+          activeFilter={this.state.filter}
+          onChange={this.filterChange}
+        />
       </div>
     );
   }
@@ -111,7 +112,7 @@ class App extends React.Component {
         <div className="Header">
           <h1>Todo List</h1>
         </div>
-        <TodoListTable />
+        <TodoList />
       </div>
     );
   }
