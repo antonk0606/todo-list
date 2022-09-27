@@ -79,6 +79,7 @@ class TodoList extends React.Component {
           </button>
         </form>
         <div className="TodoListTable">
+
           <ul>
             {this.state.todoList
               .filter(FILTER_MAP[this.state.filter])
@@ -95,6 +96,7 @@ class TodoList extends React.Component {
                 );
               })}
           </ul>
+
         </div>
         <Filters
           activeFilter={this.state.filter}
