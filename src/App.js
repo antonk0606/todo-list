@@ -48,7 +48,6 @@ class TodoListTable extends React.Component {
         return item;
       }),
     }));
-    console.log(this.state.todo);
   }
   handleChange(e) {
     this.setState(() => ({
@@ -81,6 +80,7 @@ class TodoListTable extends React.Component {
               type="radio"
               value="All"
               checked={this.state.filter === "All"}
+              readOnly
             />{" "}
             All
             <input
@@ -88,6 +88,7 @@ class TodoListTable extends React.Component {
               type="radio"
               value="Active"
               checked={this.state.filter === "Active"}
+              readOnly
             />{" "}
             Active
             <input
@@ -95,6 +96,7 @@ class TodoListTable extends React.Component {
               type="radio"
               value="Completed"
               checked={this.state.filter === "Completed"}
+              readOnly
             />{" "}
             Completed
           </form>
